@@ -6,8 +6,7 @@ RUN mvn dependency:go-offline
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-FROM mcr.microsoft.com/opendjk/jdk:17-ubuntu AS runtime
-
+FROM mcr.microsoft.com/openjdk/jdk:17-ubuntu AS runtime   
 WORKDIR /app
 COPY --from=build /app/target/spring-boot-docker.jar app.jar
 
