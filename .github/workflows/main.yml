@@ -14,22 +14,40 @@ jobs:
     - name: checkout code
       uses: actions/checkout@v2
 
-    - name: Build dockerfile
-      env:
-        IMAGE_TAG: "1.0.0"
-      run: docker build -t mi-app:$IMAGE_TAG .
+    # - name: Build dockerfile
+    #   env:
+    #     IMAGE_TAG: "1.0.0"
+    #   run: docker build -t mi-app:$IMAGE_TAG .
 
-    - name: Validate docker image  
+    # - name: Validate docker image  
+    #   env:
+    #     IMAGE_TAG: "1.0.0"
+    #   run: |
+    #     docker ps
+    #     docker images
+    #     docker run -d --name mi-app-contenedor -p 8081:8081 -e SERVERS_ADRESS=0.0.0.0 mi-app:$IMAGE_TAG
+    #     docker ps
+    #     sleep 20
+    #     docker logs mi-app-contenedor
+    #     curl -f http://localhost:8081/weatherForecast
+    #     docker stop mi-app-contenedor 
+    #     docker ps
+    #     docker ps -a
+    - name: AuthGCP
+      uses: google-github-actions@v3
+      with:
+        credentials_json: ${{ secrets.GCP_CREDENTIALS }}    
+    - name: Configure docker for GCP
+      run: gcloud auth configure-docker us-east1-docker.pkg.dev --quiet 
+    - name: BUILD TAG AND PUSH
       env:
         IMAGE_TAG: "1.0.0"
+        IMAGE_NAME: mi-app
+        PROJECT_ID: credenciales-364703
+        GCP_REPOSITORY: testtecylab
+        GCP_REGISTRY: us-east1-docker.pkg.dev
       run: |
-        docker ps
-        docker images
-        docker run -d --name mi-app-contenedor -p 8081:8081 -e SERVERS_ADRESS=0.0.0.0 mi-app:$IMAGE_TAG
-        docker ps
-        sleep 20
-        docker logs mi-app-contenedor
-        curl -f http://localhost:8081/weatherForecast
-        docker stop mi-app-contenedor 
-        docker ps
-        docker ps -a
+        docker build -t $GCP_REGISTRY/$PROJECT_ID/$GCP_REPOSITORY/$IMAGE_NAME:$IMAGE_TAG .
+        docker push $GCP_REGISTRY/$PROJECT_ID/$GCP_REPOSITORY/$IMAGE_NAME:$IMAGE_TAG
+        docker images 
+
