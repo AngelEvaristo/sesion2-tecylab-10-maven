@@ -18,3 +18,18 @@ jobs:
       env:
         IMAGE_TAG: "1.0.0"
       run: docker build -t mi-app:$IMAGE_TAG .
+
+    - name: Validate docker image  
+      env:
+        IMAGE_TAG: "1.0.0"
+      run: |
+        docker ps
+        docker images
+        docker run -d --name mi-app-contenedor -p 8081:8081 -e SERVERS_ADRESS=0.0.0.0 mi-app:$IMAGE_TAG
+        docker ps
+        sleep 20
+        docker logs mi-app-contenedor
+        curl -f http://localhost:8081/weatherForecast
+        docker stop mi-app-contenedor 
+        docker ps
+        docker ps -a
