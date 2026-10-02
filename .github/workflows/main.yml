@@ -17,4 +17,4 @@ jobs:
     - name: Build dockerfile
       env:
         IMAGE_TAG: "1.0.0"
-      run: docker build -t mi-app:$IMAGE_TAG  
+      run: docker build -t mi-app:$IMAGE_TAG .
